@@ -4,7 +4,7 @@ void FindClass(Client *c, const Seperator *sep)
 {
 	if (sep->IsNumber(2)) {
 		const auto class_id = Strings::ToInt(sep->arg[2]);
-		if (EQ::ValueWithin(class_id, Class::Warrior, Class::Berserker)) {
+		if (EQ::ValueWithin(class_id, Class::Warrior, Class::RuneKnight)) {
 			const std::string& class_name = GetClassIDName(class_id);
 			c->Message(
 				Chat::White,

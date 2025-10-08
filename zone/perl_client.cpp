@@ -2002,7 +2002,7 @@ bool Perl_Client_HasDisciplineLearned(Client* self, uint16 spell_id)
 	return self->HasDisciplineLearned(spell_id);
 }
 
-uint16_t Perl_Client_GetClassBitmask(Client* self)
+uint32_t Perl_Client_GetClassBitmask(Client* self)
 {
 	return GetPlayerClassBit(self->GetClass());
 }

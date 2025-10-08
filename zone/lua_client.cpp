@@ -150,7 +150,7 @@ void Lua_Client::SetBaseGender(int v) {
 	self->SetBaseGender(v);
 }
 
-uint16 Lua_Client::GetClassBitmask() {
+uint32 Lua_Client::GetClassBitmask() {
 	Lua_Safe_Call_Int();
 	return GetPlayerClassBit(self->GetClass());
 }
@@ -3809,7 +3809,7 @@ luabind::scope lua_register_client() {
 	.def("GetCarriedPlatinum", (uint32(Lua_Client::*)(void))&Lua_Client::GetCarriedPlatinum)
 	.def("GetCharacterFactionLevel", (int(Lua_Client::*)(int))&Lua_Client::GetCharacterFactionLevel)
 	.def("GetClassAbbreviation", (std::string(Lua_Client::*)(void))&Lua_Client::GetClassAbbreviation)
-	.def("GetClassBitmask", (uint16(Lua_Client::*)(void))&Lua_Client::GetClassBitmask)
+	.def("GetClassBitmask", (uint32(Lua_Client::*)(void))&Lua_Client::GetClassBitmask)
 	.def("GetClientMaxLevel", (int(Lua_Client::*)(void))&Lua_Client::GetClientMaxLevel)
 	.def("GetClientVersion", (int(Lua_Client::*)(void))&Lua_Client::GetClientVersion)
 	.def("GetClientVersionBit", (uint32(Lua_Client::*)(void))&Lua_Client::GetClientVersionBit)

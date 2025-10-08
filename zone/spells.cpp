@@ -1071,8 +1071,17 @@ bool Client::CheckFizzle(uint16 spell_id)
 	//Live AA - Spell Casting Expertise, Mastery of the Past
 	no_fizzle_level = aabonuses.MasteryofPast + itembonuses.MasteryofPast + spellbonuses.MasteryofPast;
 
-	if (spells[spell_id].classes[GetClass()-1] < no_fizzle_level) {
-		return true;
+	if ((GetClass() - 1) >= Class::Warrior && (GetClass() - 1) <= Class::Berserker)
+	{
+		if (spells[spell_id].classes[GetClass()-1] < no_fizzle_level) {
+			return true;
+		}
+	}
+	else if (GetClass() == Class::RuneKnight )
+	{
+		if (spells[spell_id].class17 < no_fizzle_level){
+			return true;
+		}
 	}
 
 	if (RuleB(Spells, UseLegacyFizzleCode)) {
@@ -1081,9 +1090,18 @@ bool Client::CheckFizzle(uint16 spell_id)
 
 		int minimum_level = UINT8_MAX;
 		for (int a = 0; a < Class::PLAYER_CLASS_COUNT; a++) {
-			int this_lvl = spells[spell_id].classes[a];
-			if (this_lvl < minimum_level) {
-				minimum_level = this_lvl;
+			if (a == 17) {
+				int this_lvl = spells[spell_id].class17;
+					if (this_lvl < minimum_level) {
+						minimum_level = this_lvl;
+					}
+			}
+
+			else {
+				int this_lvl = spells[spell_id].classes[a];
+					if (this_lvl < minimum_level) {
+						minimum_level = this_lvl;
+					}
 			}
 		}
 
@@ -1149,14 +1167,28 @@ bool Client::CheckFizzle(uint16 spell_id)
 	//is there any sort of focus that affects fizzling?
 
 	int par_skill;
+	int par_skill_alt;
 	int act_skill;
 
-	par_skill = spells[spell_id].classes[GetClass()-1] * 5 - 10;//IIRC even if you are lagging behind the skill levels you don't fizzle much
-	if (par_skill > 235) {
-		par_skill = 235;
+	par_skill = spells[spell_id].classes[GetClass()-1] * 5 - 10; //IIRC even if you are lagging behind the skill levels you don't fizzle much
+	par_skill_alt = spells[spell_id].class17 * 5 - 10;
+
+	if (GetClass() == Class::RuneKnight)
+	{
+		if (par_skill_alt > 235){
+			par_skill_alt = 235;
+		}
+	}
+
+	if ((GetClass() -1) >= Class::Warrior && (GetClass() -1) <= Class::Berserker)
+	{
+		if (par_skill > 235) {
+			par_skill = 235;
+		}
 	}
 
 	par_skill += spells[spell_id].classes[GetClass()-1]; // maximum of 270 for level 65 spell
+	par_skill_alt += spells[spell_id].class17;
 
 	act_skill = GetSkill(spells[spell_id].skill);
 	act_skill += GetLevel(); // maximum of whatever the client can cheat
@@ -4374,29 +4406,42 @@ bool Mob::SpellOnTarget(
 		switch (RuleI(Spells, ReflectType)) {
 			case REFLECT_SINGLE_TARGET_SPELLS_ONLY: {
 				if (spells[spell_id].target_type == ST_Target) {
-					for (int y = 0; y < 16; y++) {
+					for (int y = 0; y < 17; y++) {
+						if (y == 17){
+							if (spells[spell_id].class17 < 255){
+								can_spell_reflect = true;
+							}
+						}
+						else if (y <= 16){
+							if (spells[spell_id].classes[y] < 255) {
+								can_spell_reflect = true;
+							}
+						}
+
+					}
+				}
+				break;
+			}
+			case REFLECT_ALL_PLAYER_SPELLS: {
+				for (int y = 0; y < 17; y++) {
+					if (y == 17){
+						if (spells[spell_id].class17 < 255){
+							can_spell_reflect = true;
+						}
+					}
+					else if (y <= 16){
 						if (spells[spell_id].classes[y] < 255) {
 							can_spell_reflect = true;
 						}
 					}
-				}
 
-				break;
-			}
-			case REFLECT_ALL_PLAYER_SPELLS: {
-				for (int y = 0; y < 16; y++) {
-					if (spells[spell_id].classes[y] < 255) {
-						can_spell_reflect = true;
-					}
 				}
-
 				break;
 			}
 			case RELFECT_ALL_SINGLE_TARGET_SPELLS: {
 				if (spells[spell_id].target_type == ST_Target) {
 					can_spell_reflect = true;
 				}
-
 				break;
 			}
 			case REFLECT_ALL_SPELLS: {//This is live like behavior
@@ -7424,7 +7469,7 @@ bool Mob::CheckItemRaceClassDietyRestrictionsOnCast(uint32 inventory_slot) {
 	EQ::ItemInstance *itm = CastToClient()->GetInv().GetItem(inventory_slot);
 	int bitmask = 1;
 	bitmask = bitmask << (CastToClient()->GetClass() - 1);
-	if (itm && itm->GetItem()->Classes != 65535) {
+	if (itm && itm->GetItem()->Classes != 4294967295) {
 		if ((itm->GetItem()->Click.Type == EQ::item::ItemEffectEquipClick) && !(itm->GetItem()->Classes & bitmask)) {
 			if (CastToClient()->ClientVersion() < EQ::versions::ClientVersion::SoF) {
 				std::string message = fmt::format(

@@ -5484,7 +5484,7 @@ std::string lua_silent_say_link(std::string text, std::string link_name) {
 	return Saylink::Silent(text, link_name);
 }
 
-uint16 lua_get_class_bitmask(uint8 class_id) {
+uint32 lua_get_class_bitmask(uint8 class_id) {
 	return GetPlayerClassBit(class_id);
 }
 

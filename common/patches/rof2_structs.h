@@ -297,7 +297,7 @@ struct Membership_Details_Struct
 /*0012*/ uint32 race_entry_count;	// Seen 15
 /*1044*/ Membership_Entry_Struct membership_races[15]; // 120 Bytes
 /*0012*/ uint32 class_entry_count;	// Seen 15
-/*1044*/ Membership_Entry_Struct membership_classes[15]; // 120 Bytes
+/*1044*/ Membership_Entry_Struct membership_classes[16]; // 120 Bytes
 /*1044*/ uint32 exit_url_length;	// Length of the exit_url string (0 for none)
 /*1048*/ //char exit_url[42];		// Upgrade to Silver or Gold Membership URL
 /*1048*/ uint32 exit_url_length2;	// Length of the exit_url2 string (0 for none)

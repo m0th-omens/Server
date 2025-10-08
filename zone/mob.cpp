@@ -1016,12 +1016,14 @@ bool Mob::IsIntelligenceCasterClass() const
 		case Class::Wizard:
 		case Class::Magician:
 		case Class::Enchanter:
+		case Class::RuneKnight:
 		case Class::ShadowKnightGM:
 		case Class::BardGM:
 		case Class::NecromancerGM:
 		case Class::WizardGM:
 		case Class::MagicianGM:
 		case Class::EnchanterGM:
+		case Class::RuneKnightGM:
 			return true;
 	}
 
@@ -1059,6 +1061,7 @@ bool Mob::IsWarriorClass() const
 		case Class::Rogue:
 		case Class::Beastlord:
 		case Class::Berserker:
+		case Class::RuneKnight:
 		case Class::WarriorGM:
 		case Class::PaladinGM:
 		case Class::RangerGM:
@@ -1068,6 +1071,7 @@ bool Mob::IsWarriorClass() const
 		case Class::RogueGM:
 		case Class::BeastlordGM:
 		case Class::BerserkerGM:
+		case Class::RuneKnightGM:
 			return true;
 		default:
 			break;
@@ -1105,11 +1109,13 @@ uint8 Mob::GetArchetype() const
 		case Class::ShadowKnight:
 		case Class::Bard:
 		case Class::Beastlord:
+		case Class::RuneKnight:
 		case Class::PaladinGM:
 		case Class::RangerGM:
 		case Class::ShadowKnightGM:
 		case Class::BardGM:
 		case Class::BeastlordGM:
+		case Class::RuneKnightGM:
 			return Archetype::Hybrid;
 		case Class::Cleric:
 		case Class::Druid:
@@ -1226,6 +1232,9 @@ void Mob::SetSpawnLastNameByClass(NewSpawn_Struct* ns)
 			break;
 		case Class::BerserkerGM:
 			strcpy(ns->spawn.lastName, "Berserker Guildmaster");
+			break;
+		case Class::RuneKnightGM:
+			strcpy(ns->spawn.lastName, "Rune Knight Guildmaster");
 			break;
 		case Class::MercenaryLiaison:
 			strcpy(ns->spawn.lastName, "Mercenary Liaison");
@@ -1466,7 +1475,7 @@ void Mob::FillSpawnStruct(NewSpawn_Struct* ns, Mob* ForWho)
 	}
 
 	if (RuleB(Character, AllowCrossClassTrainers) && ForWho) {
-		if (ns->spawn.class_ >= Class::WarriorGM && ns->spawn.class_ <= Class::BerserkerGM) {
+		if (ns->spawn.class_ >= Class::WarriorGM && ns->spawn.class_ <= Class::RuneKnightGM) {
 			int trainer_class = Class::WarriorGM + (ForWho->GetClass() - 1);
 			ns->spawn.class_ = trainer_class;
 		}
@@ -4684,7 +4693,8 @@ bool Mob::CanThisClassTripleAttack() const {
 			GetClass() == Class::Warrior ||
 			GetClass() == Class::Ranger ||
 			GetClass() == Class::Monk ||
-			GetClass() == Class::Berserker
+			GetClass() == Class::Berserker ||
+			GetClass() == Class::RuneKnight
 		);
 	}
 
@@ -5263,7 +5273,7 @@ int32 Mob::GetActSpellCasttime(uint16 spell_id, int32 casttime)
 	int32 cast_reducer_no_limit = GetFocusEffect(focusFcCastTimeMod2, spell_id);
 
 	if (level > 50 && casttime >= 3000 && !spells[spell_id].good_effect &&
-	    (GetClass() == Class::Ranger || GetClass() == Class::ShadowKnight || GetClass() == Class::Paladin || GetClass() == Class::Beastlord)) {
+	    (GetClass() == Class::Ranger || GetClass() == Class::ShadowKnight || GetClass() == Class::Paladin || GetClass() == Class::Beastlord || GetClass() == Class::RuneKnight)) {
 		int level_mod = std::min(15, GetLevel() - 50);
 		cast_reducer += level_mod * 3;
 	}
@@ -7250,6 +7260,7 @@ int8 Mob::GetDecayEffectValue(uint16 spell_id, uint16 spelleffect) {
 		return false;
 
 	int spell_level = spells[spell_id].classes[(GetClass()%17) - 1];
+	int spell_level_alt = spells[spell_id].class17;
 	int effect_value = 0;
 	int lvlModifier = 100;
 
@@ -7262,18 +7273,39 @@ int8 Mob::GetDecayEffectValue(uint16 spell_id, uint16 spelleffect) {
 					int critchance = spells[buffs[slot].spellid].base_value[i];
 					int decay = spells[buffs[slot].spellid].limit_value[i];
 					int lvldiff = spell_level - spells[buffs[slot].spellid].max_value[i];
+					int lvldiff_alt = spell_level_alt - spells[buffs[slot].spellid].max_value[i];
 
-					if(lvldiff > 0 && decay > 0)
+					if (GetClass() == Class::RuneKnight)
 					{
-						lvlModifier -= decay*lvldiff;
-						if (lvlModifier > 0){
-							critchance = (critchance*lvlModifier)/100;
+						if (lvldiff_alt > 0 && decay > 0)
+						{
+							lvlModifier -= decay * lvldiff_alt;
+							if (lvlModifier > 0) {
+								critchance = (critchance * lvlModifier) / 100;
+								effect_value += critchance;
+							}
+						}
+						else
+						{
+							effect_value += critchance;
+						}
+
+					}
+					else
+					{
+						if (lvldiff > 0 && decay > 0)
+						{
+							lvlModifier -= decay * lvldiff;
+							if (lvlModifier > 0) {
+								critchance = (critchance * lvlModifier) / 100;
+								effect_value += critchance;
+							}
+						}
+						else
+						{
 							effect_value += critchance;
 						}
 					}
-
-					else
-						effect_value += critchance;
 				}
 			}
 		}
@@ -7680,7 +7712,7 @@ bool Mob::CanClassEquipItem(uint32 item_id)
 		return false;
 	}
 
-	const uint16 item_classes = item->Classes;
+	const uint32 item_classes = item->Classes;
 	if (item_classes == Class::ALL_CLASSES_BITMASK) {
 		return true;
 	}
@@ -7690,7 +7722,7 @@ bool Mob::CanClassEquipItem(uint32 item_id)
 		return false;
 	}
 
-	const uint16 class_bitmask = GetPlayerClassBit(class_id);
+	const uint32 class_bitmask = GetPlayerClassBit(class_id);
 	return (item_classes & class_bitmask);
 }
 
@@ -8443,6 +8475,8 @@ std::string Mob::GetClassPlural()
 			return "Beastlords";
 		case Class::Berserker:
 			return "Berserkers";
+		case Class::RuneKnight:
+			return "Runeknights";
 		default:
 			return "Classes";
 	}
@@ -8768,6 +8802,7 @@ bool Mob::IsGuildmaster() const {
 		case Class::EnchanterGM:
 		case Class::BeastlordGM:
 		case Class::BerserkerGM:
+		case Class::RuneKnightGM:
 			return true;
 		default:
 			return false;

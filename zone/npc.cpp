@@ -4241,6 +4241,7 @@ bool NPC::IsGuildmasterForClient(Client *c) {
 		{ Class::Enchanter, Class::EnchanterGM },
 		{ Class::Beastlord, Class::BeastlordGM },
 		{ Class::Berserker, Class::BerserkerGM },
+		{ Class::RuneKnight, Class::RuneKnightGM },
 	};
 
 	if (guildmaster_map.find(c->GetClass()) != guildmaster_map.end()) {

@@ -298,7 +298,7 @@ void Client::SendMembership() {
 
 	mc->membership = 2;				//Hardcode to gold for now. We don't use anything else.
 	mc->races = 0x1ffff;			// Available Races (4110 for silver)
-	mc->classes = 0x1ffff;			// Available Classes (4614 for silver) - Was 0x101ffff
+	mc->classes = 0xffffffff;			// Available Classes (4614 for silver) - Was 0x101ffff
 	mc->entrysize = 21;				// Number of membership setting entries below
 	mc->entries[0] = 0xffffffff;	// Max AA Restriction
 	mc->entries[1] = 0xffffffff;	// Max Level Restriction
@@ -348,24 +348,56 @@ void Client::SendMembershipSettings() {
 	}
 
 	mds->race_entry_count = 15;
-	mds->class_entry_count = 15;
+	mds->class_entry_count = 16;
 
 	uint32 cur_purchase_id = 90287;
 	uint32 cur_purchase_id2 = 90301;
 	uint32 cur_bitwise_value = 1;
+
+	// RACIAL CHECKS
 	for (int entry_id=0; entry_id < 15; entry_id++)
 	{
 		if (entry_id == 0)
 		{
 			mds->membership_races[entry_id].purchase_id = 1;
 			mds->membership_races[entry_id].bitwise_entry = 0x1ffff;
-			mds->membership_classes[entry_id].purchase_id = 1;
-			mds->membership_classes[entry_id].bitwise_entry = 0x1ffff;
 		}
 		else
 		{
 			mds->membership_races[entry_id].purchase_id = cur_purchase_id;
 
+			if (entry_id == 1)
+			{
+				mds->membership_races[entry_id].bitwise_entry = 4110;
+			}
+			else if (entry_id == 2)
+			{
+				mds->membership_races[entry_id].bitwise_entry = 4110;
+			}
+			else
+			{
+				if (entry_id == 12)
+				{
+					// Live Skips 4096
+					cur_bitwise_value *= 2;
+				}
+				mds->membership_races[entry_id].bitwise_entry = cur_bitwise_value;
+			}
+			cur_purchase_id++;
+		}
+		cur_bitwise_value *= 2;
+	}
+
+	// CLASS CHECKS
+	for (int entry_id = 0; entry_id < 16; entry_id++)
+	{
+		if (entry_id == 0)
+		{
+			mds->membership_classes[entry_id].purchase_id = 1;
+			mds->membership_classes[entry_id].bitwise_entry = 0xffffffff;
+		}
+		else
+		{
 			if (entry_id < 3)
 			{
 				mds->membership_classes[entry_id].purchase_id = cur_purchase_id;
@@ -378,12 +410,10 @@ void Client::SendMembershipSettings() {
 
 			if (entry_id == 1)
 			{
-				mds->membership_races[entry_id].bitwise_entry = 4110;
 				mds->membership_classes[entry_id].bitwise_entry = 4614;
 			}
 			else if (entry_id == 2)
 			{
-				mds->membership_races[entry_id].bitwise_entry = 4110;
 				mds->membership_classes[entry_id].bitwise_entry = 4614;
 			}
 			else
@@ -393,13 +423,13 @@ void Client::SendMembershipSettings() {
 					// Live Skips 4096
 					cur_bitwise_value *= 2;
 				}
-				mds->membership_races[entry_id].bitwise_entry = cur_bitwise_value;
 				mds->membership_classes[entry_id].bitwise_entry = cur_bitwise_value;
 			}
 			cur_purchase_id++;
 		}
 		cur_bitwise_value *= 2;
 	}
+
 	mds->exit_url_length = 0;	// Live uses 42
 	//strcpy(eq->exit_url, "http://www.everquest.com/free-to-play/exit");
 	mds->exit_url_length2 = 0;	// Live uses 49
@@ -590,7 +620,7 @@ bool Client::HandleNameApprovalPacket(const EQApplicationPacket *app)
 		return false;
 	}
 
-	if (!EQ::ValueWithin(class_id, Class::Warrior, Class::Berserker)) {
+	if (!EQ::ValueWithin(class_id, Class::Warrior, Class::RuneKnight)) {
 		LogInfo("Invalid Class ID.");
 		return false;
 	}
@@ -2045,27 +2075,29 @@ bool CheckCharCreateInfoTitanium(CharCreate_Struct *cc)
 	{ /*Magician*/      0,  10,   0,   0,   0,  10,   0,  30},
 	{ /*Enchanter*/     0,   0,   0,   0,   0,  10,  10,  30},
 	{ /*Beastlord*/     0,  10,   5,   0,  10,   0,   5,  20},
-	{ /*Berserker*/    10,   5,   0,  10,   0,   0,   0,  25}
+	{ /*Berserker*/    10,   5,   0,  10,   0,   0,   0,  25},
+	{ /*RuneKnight*/    5,   5,   0,   0,   0,  10,   5,  25}
 	};
 
 	static const bool ClassRaceLookupTable[Class::PLAYER_CLASS_COUNT][_TABLE_RACES]=
 	{                   /*Human  Barbarian Erudite Woodelf Highelf Darkelf Halfelf Dwarf  Troll  Ogre   Halfling Gnome  Iksar  Vahshir Froglok Drakkin*/
-	{ /*Warrior*/         true,  true,     false,  true,   false,  true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
-	{ /*Cleric*/          true,  false,    true,   false,  true,   true,   true,   true,  false, false, true,    true,  false, false,  true,   true},
-	{ /*Paladin*/         true,  false,    true,   false,  true,   false,  true,   true,  false, false, true,    true,  false, false,  true,   true},
-	{ /*Ranger*/          true,  false,    false,  true,   false,  false,  true,   false, false, false, true,    false, false, false,  false,  true},
-	{ /*ShadowKnight*/    true,  false,    true,   false,  false,  true,   false,  false, true,  true,  false,   true,  true,  false,  true,   true},
-	{ /*Druid*/           true,  false,    false,  true,   false,  false,  true,   false, false, false, true,    false, false, false,  false,  true},
-	{ /*Monk*/            true,  false,    false,  false,  false,  false,  false,  false, false, false, false,   false, true,  false,  false,  true},
-	{ /*Bard*/            true,  false,    false,  true,   false,  false,  true,   false, false, false, false,   false, false, true,   false,  true},
-	{ /*Rogue*/           true,  true,     false,  true,   false,  true,   true,   true,  false, false, true,    true,  false, true,   true,   true},
-	{ /*Shaman*/          false, true,     false,  false,  false,  false,  false,  false, true,  true,  false,   false, true,  true,   true,   false},
-	{ /*Necromancer*/     true,  false,    true,   false,  false,  true,   false,  false, false, false, false,   true,  true,  false,  true,   true},
-	{ /*Wizard*/          true,  false,    true,   false,  true,   true,   false,  false, false, false, false,   true,  false, false,  true,   true},
-	{ /*Magician*/        true,  false,    true,   false,  true,   true,   false,  false, false, false, false,   true,  false, false,  false,  true},
-	{ /*Enchanter*/       true,  false,    true,   false,  true,   true,   false,  false, false, false, false,   true,  false, false,  false,  true},
-	{ /*Beastlord*/       false, true,     false,  false,  false,  false,  false,  false, true,  true,  false,   false, true,  true,   false,  false},
-	{ /*Berserker*/       false, true,     false,  false,  false,  false,  false,  true,  true,  true,  false,   false, false, true,   false,  false}
+	{ /*Warrior*/         true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*Cleric*/          true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*Paladin*/         true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*Ranger*/          true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*ShadowKnight*/    true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*Druid*/           true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*Monk*/            true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*Bard*/            true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*Rogue*/           true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*Shaman*/          true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*Necromancer*/     true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*Wizard*/          true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*Magician*/        true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*Enchanter*/       true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*Beastlord*/       true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*Berserker*/       true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true},
+	{ /*RuneKnight*/      true,  true,     true,   true,   true,   true,   true,   true,  true,  true,  true,    true,  true,  true,   true,   true}
 	};
 
 	if (!cc)
@@ -2074,6 +2106,8 @@ bool CheckCharCreateInfoTitanium(CharCreate_Struct *cc)
 	LogInfo("Validating char creation info");
 
 	classtemp = cc->class_ - 1;
+	if (cc->class_ == Class::RuneKnight) classtemp = 17; // map just in case
+
 	racetemp = cc->race - 1;
 	// these have non sequential race numbers so they need to be mapped
 	if (cc->race == Race::Froglok2) racetemp = 14;
@@ -2083,7 +2117,7 @@ bool CheckCharCreateInfoTitanium(CharCreate_Struct *cc)
 
 	// if out of range looking it up in the table would crash stuff
 	// so we return from these
-	if (classtemp >= Class::PLAYER_CLASS_COUNT) {
+	if (classtemp >= Class::PLAYER_CLASS_COUNT + 1) {
 		LogInfo(" class is out of range");
 		return false;
 	}

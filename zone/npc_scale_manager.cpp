@@ -523,6 +523,30 @@ uint32 NpcScaleManager::GetClassLevelDamageMod(uint32 level, uint32 npc_class)
 			}
 			break;
 		}
+		case Class::RuneKnight: {
+			if (level < 35) {
+				multiplier = 210;
+			}
+			else if (level < 45) {
+				multiplier = 220;
+			}
+			else if (level < 51) {
+				multiplier = 230;
+			}
+			else if (level < 56) {
+				multiplier = 240;
+			}
+			else if (level < 60) {
+				multiplier = 250;
+			}
+			else if (level < 68) {
+				multiplier = 260;
+			}
+			else {
+				multiplier = 270;
+			}
+			break;
+		}
 		default: {
 			if (level < 35) {
 				multiplier = 210;

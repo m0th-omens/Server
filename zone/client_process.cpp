@@ -1179,15 +1179,27 @@ void Client::OPMemorizeSpell(const EQApplicationPacket* app)
 		m->scribing != memSpellForget &&
 		(
 			!IsPlayerClass(GetClass()) ||
+			GetLevel() < spells[m->spell_id].class17 ||
 			GetLevel() < spells[m->spell_id].classes[GetClass() - 1]
 		)
 	) {
-		MessageString(
-			Chat::Red,
-			SPELL_LEVEL_TO_LOW,
-			std::to_string(spells[m->spell_id].classes[GetClass() - 1]).c_str(),
-			spells[m->spell_id].name
-		);
+		if (GetClass() == 17)
+		{
+			MessageString(
+				Chat::Red,
+				SPELL_LEVEL_TO_LOW,
+				std::to_string(spells[m->spell_id].class17).c_str(),
+				spells[m->spell_id].name);
+		}
+		else
+		{
+			MessageString(
+				Chat::Red,
+				SPELL_LEVEL_TO_LOW,
+				std::to_string(spells[m->spell_id].classes[GetClass() - 1]).c_str(),
+				spells[m->spell_id].name
+			);
+		}
 		return;
 	}
 
@@ -1625,7 +1637,7 @@ void Client::OPGMTraining(const EQApplicationPacket *app)
 
 	Mob* pTrainer = entity_list.GetMob(gmtrain->npcid);
 
-	if (!pTrainer || !pTrainer->IsNPC() || pTrainer->GetClass() < Class::WarriorGM || pTrainer->GetClass() > Class::BerserkerGM) {
+	if (!pTrainer || !pTrainer->IsNPC() || pTrainer->GetClass() < Class::WarriorGM || pTrainer->GetClass() > Class::RuneKnightGM) {
 		return;
 	}
 
@@ -1685,8 +1697,9 @@ void Client::OPGMEndTraining(const EQApplicationPacket *app)
 	FastQueuePacket(&outapp);
 
 	Mob* pTrainer = entity_list.GetMob(p->npcid);
-	if(!pTrainer || !pTrainer->IsNPC() || pTrainer->GetClass() < Class::WarriorGM || pTrainer->GetClass() > Class::BerserkerGM)
+	if(!pTrainer || !pTrainer->IsNPC() || pTrainer->GetClass() < Class::WarriorGM || pTrainer->GetClass() > Class::RuneKnightGM) {
 		return;
+	}
 
 	//you can only use your own trainer, client enforces this, but why trust it
 	if (!RuleB(Character, AllowCrossClassTrainers)) {
@@ -1716,8 +1729,9 @@ void Client::OPGMTrainSkill(const EQApplicationPacket *app)
 	GMSkillChange_Struct* gmskill = (GMSkillChange_Struct*) app->pBuffer;
 
 	Mob* pTrainer = entity_list.GetMob(gmskill->npcid);
-	if(!pTrainer || !pTrainer->IsNPC() || pTrainer->GetClass() < Class::WarriorGM || pTrainer->GetClass() > Class::BerserkerGM)
+	if(!pTrainer || !pTrainer->IsNPC() || pTrainer->GetClass() < Class::WarriorGM || pTrainer->GetClass() > Class::RuneKnightGM){
 		return;
+	}
 
 	//you can only use your own trainer, client enforces this, but why trust it
 	if (!RuleB(Character, AllowCrossClassTrainers)) {

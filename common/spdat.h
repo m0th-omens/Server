@@ -588,6 +588,7 @@ enum SpellRestriction
 	IS_END_OR_MANA_BELOW_30_PCT2                                              = 49809, // You can only perform this solo if you have less than 30% mana or endurance.
 	HAS_NO_HARMONIOUS_PRECISION_BUFF                                          = 50003, // This spell will not work if you have the Harmonious Precision line active.
 	HAS_NO_HARMONIOUS_EXPANSE_BUFF                                            = 50009, // This spell will not work if you have the Harmonious Expanse line active.
+	IS_RUNEKNIGHT_CLASS														  = 50010, // This spell will only affect Rune Knights.
 	UNKNOWN_99999                                                             = 99999, // | caster restriction | works will spell 27672 Strike of Ire
 };
 
@@ -1600,7 +1601,7 @@ namespace SpellEffect {
 // number. note that the id field is counted as 0, this way the numbers
 // here match the numbers given to sep in the loading function net.cpp
 //
-#define SPELL_LOAD_FIELD_COUNT 236
+#define SPELL_LOAD_FIELD_COUNT 237
 
 struct SPDat_Spell_Struct
 {
@@ -1647,7 +1648,7 @@ struct SPDat_Spell_Struct
 /* 101 */	int8 zone_type; // 01=Outdoors, 02=dungeons, ff=Any -- ZONETYPE
 /* 102 */	int8 environment_type; // -- ENVIRONMENTTYPE
 /* 103 */	int8 time_of_day; // -- TIMEOFDAY
-/* 104 */	uint8 classes[Class::PLAYER_CLASS_COUNT]; // Classes, and their min levels -- WARRIORMIN ... BERSERKERMIN
+/* 104 */	uint8 classes[16]; // Classes, and their min levels -- WARRIORMIN ... BERSERKERMIN
 /* 120 */	uint8 casting_animation; // -- CASTINGANIM
 /* 121 */	//uint8 TargetAnim; // -- TARGETANIM
 /* 122 */	//uint32 TravelType; // -- TRAVELTYPE
@@ -1758,6 +1759,7 @@ struct SPDat_Spell_Struct
 /* 235 */	//bool is_beta_only; // -- IS_BETA_ONLY
 /* 236 */	//int spell_subgroup; // -- SPELL_SUBGROUP
 			uint8 damage_shield_type; // This field does not exist in spells_us.txt
+/* 237 */	uint8 class17; // For Class 17
 };
 
 extern const SPDat_Spell_Struct* spells;

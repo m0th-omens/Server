@@ -715,6 +715,7 @@ int Mob::GetACSoftcap()
 
 	switch (GetClass()) {
 	case Class::Warrior:
+	case Class::RuneKnight:
 		return war_softcaps[level];
 	case Class::Cleric:
 	case Class::Bard:
@@ -3971,7 +3972,8 @@ bool Client::CheckTripleAttack()
 				GetClass() == Class::Warrior ||
 				GetClass() == Class::Ranger ||
 				GetClass() == Class::Monk ||
-				GetClass() == Class::Berserker
+				GetClass() == Class::Berserker ||
+				GetClass() == Class::RuneKnight
 			)
 		) {
 			switch (GetClass()) {
@@ -3987,6 +3989,8 @@ bool Client::CheckTripleAttack()
 				case Class::Berserker:
 					chance = RuleI(Combat, ClassicTripleAttackChanceBerserker);
 					break;
+				case Class::RuneKnight:
+					chance = RuleI(Combat, ClassicTripleAttackChanceWarrior);
 				default:
 					break;
 			}

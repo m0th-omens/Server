@@ -55,7 +55,7 @@ bool Lua_ItemInst::IsStackable() {
 	return self->IsStackable();
 }
 
-bool Lua_ItemInst::IsEquipable(uint16 race_bitmask, uint16 class_bitmask) {
+bool Lua_ItemInst::IsEquipable(uint16 race_bitmask, uint32 class_bitmask) {
 	Lua_Safe_Call_Bool();
 	return self->IsEquipable(race_bitmask, class_bitmask);
 }
@@ -491,7 +491,7 @@ luabind::scope lua_register_iteminst() {
 	.def("IsAugmentable", (bool(Lua_ItemInst::*)(void))&Lua_ItemInst::IsAugmentable)
 	.def("IsAugmented", (bool(Lua_ItemInst::*)(void))&Lua_ItemInst::IsAugmented)
 	.def("IsEquipable", (bool(Lua_ItemInst::*)(int16))&Lua_ItemInst::IsEquipable)
-	.def("IsEquipable", (bool(Lua_ItemInst::*)(uint16,uint16))&Lua_ItemInst::IsEquipable)
+	.def("IsEquipable", (bool(Lua_ItemInst::*)(uint16,uint32))&Lua_ItemInst::IsEquipable)
 	.def("IsEvolving", (bool(Lua_ItemInst::*)(void))&Lua_ItemInst::IsEvolving)
 	.def("IsExpendable", (bool(Lua_ItemInst::*)(void))&Lua_ItemInst::IsExpendable)
 	.def("IsInstNoDrop", (bool(Lua_ItemInst::*)(void))&Lua_ItemInst::IsInstNoDrop)

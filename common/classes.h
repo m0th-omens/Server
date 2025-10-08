@@ -41,6 +41,9 @@ namespace Class {
 	constexpr uint8 Enchanter                 = 14;
 	constexpr uint8 Beastlord                 = 15;
 	constexpr uint8 Berserker                 = 16;
+	constexpr uint8 RuneKnight                = 17;
+	// 18
+	// 19
 	constexpr uint8 WarriorGM                 = 20;
 	constexpr uint8 ClericGM                  = 21;
 	constexpr uint8 PaladinGM                 = 22;
@@ -57,6 +60,7 @@ namespace Class {
 	constexpr uint8 EnchanterGM               = 33;
 	constexpr uint8 BeastlordGM               = 34;
 	constexpr uint8 BerserkerGM               = 35;
+	constexpr uint8 RuneKnightGM              = 36;
 	constexpr uint8 Banker                    = 40;
 	constexpr uint8 Merchant                  = 41;
 	constexpr uint8 DiscordMerchant           = 59;
@@ -72,11 +76,11 @@ namespace Class {
 	constexpr uint8 AlternateCurrencyMerchant = 70;
 	constexpr uint8 MercenaryLiaison          = 71;
 
-	constexpr uint8  PLAYER_CLASS_COUNT  = 16;
-	constexpr uint16 ALL_CLASSES_BITMASK = 65535;
+	constexpr uint8  PLAYER_CLASS_COUNT  = 17;
+	constexpr uint32 ALL_CLASSES_BITMASK = std::numeric_limits<uint32>::max();
 };
 
-static std::map<uint8, uint16> player_class_bitmasks = {
+static std::map<uint8, uint32> player_class_bitmasks = {
 	{Class::Warrior,      1},
 	{Class::Cleric,       2},
 	{Class::Paladin,      4},
@@ -93,6 +97,7 @@ static std::map<uint8, uint16> player_class_bitmasks = {
 	{Class::Enchanter,    8192},
 	{Class::Beastlord,    16384},
 	{Class::Berserker,    32768},
+	{Class::RuneKnight,   65536},
 };
 
 static std::string shadow_knight_class_name = (
@@ -118,6 +123,7 @@ static std::map<uint8, std::string> class_names = {
 	{Class::Enchanter,    "Enchanter"},
 	{Class::Beastlord,    "Beastlord"},
 	{Class::Berserker,    "Berserker"},
+	{Class::RuneKnight,   "Rune Knight"},
 };
 
 
@@ -140,7 +146,7 @@ bool IsPlayerClass(uint8 class_id);
 const std::string GetPlayerClassAbbreviation(uint8 class_id);
 
 uint8 GetPlayerClassValue(uint8 class_id);
-uint16 GetPlayerClassBit(uint8 class_id);
+uint32 GetPlayerClassBit(uint8 class_id);
 
 bool IsFighterClass(uint8 class_id);
 bool IsSpellFighterClass(uint8 class_id);

@@ -138,8 +138,19 @@ int64 Mob::GetActSpellDamage(uint16 spell_id, int64 value, Mob* target) {
 			if (RuleB(Spells, IgnoreSpellDmgLvlRestriction) && !spells[spell_id].no_heal_damage_item_mod && itembonuses.SpellDmg) {
 				value -= GetExtraSpellAmt(spell_id, itembonuses.SpellDmg, base_value) * ratio / 100;
 
-			} else if (!spells[spell_id].no_heal_damage_item_mod && itembonuses.SpellDmg && spells[spell_id].classes[(GetClass() % 17) - 1] >= GetLevel() - 5) {
-				value -= GetExtraSpellAmt(spell_id, itembonuses.SpellDmg, base_value) * ratio / 100;
+			}
+			else if (spells[spell_id].classes[(GetClass() % 17) - 1] >= Class::Warrior - 1 || spells[spell_id].classes[(GetClass() % 17) - 1] <= Class::Berserker)
+			{
+				if (!spells[spell_id].no_heal_damage_item_mod && itembonuses.SpellDmg && (spells[spell_id].classes[(GetClass() % 17) - 1] >= GetLevel() - 5)) {
+					value -= GetExtraSpellAmt(spell_id, itembonuses.SpellDmg, base_value) * ratio / 100;
+				}
+			}
+			else
+			{
+				if (!spells[spell_id].no_heal_damage_item_mod && itembonuses.SpellDmg && (spells[spell_id].class17 >= GetLevel() - 5))
+				{
+					value -= GetExtraSpellAmt(spell_id, itembonuses.SpellDmg, base_value) * ratio / 100;
+				}
 			}
 
 			// legacy manaburn can crit, but is still held to the same cap
@@ -187,12 +198,19 @@ int64 Mob::GetActSpellDamage(uint16 spell_id, int64 value, Mob* target) {
 	if (RuleB(Spells, IgnoreSpellDmgLvlRestriction) && !spells[spell_id].no_heal_damage_item_mod && itembonuses.SpellDmg)
 		value -= GetExtraSpellAmt(spell_id, itembonuses.SpellDmg, base_value);
 
-	else if (
-		!spells[spell_id].no_heal_damage_item_mod &&
-		GetSpellDmg() &&
-		spells[spell_id].classes[(GetClass() % 17) - 1] >= GetLevel() - 5
-	) {
-		value -= GetExtraSpellAmt(spell_id, GetSpellDmg(), base_value);
+	else if ((GetClass() - 1) >= Class::Warrior && (GetClass() - 1) <= Class::Berserker){
+		if (!spells[spell_id].no_heal_damage_item_mod &&
+			GetSpellDmg() &&
+			(spells[spell_id].classes[(GetClass() % 17) - 1] >= GetLevel() - 5)) {
+				value -= GetExtraSpellAmt(spell_id, GetSpellDmg(), base_value);
+		}
+	}
+	else if ((GetClass() - 1) == Class::RuneKnight) {
+		if (!spells[spell_id].no_heal_damage_item_mod &&
+			GetSpellDmg() &&
+			(spells[spell_id].class17 >= GetLevel() - 5)) {
+				value -= GetExtraSpellAmt(spell_id, GetSpellDmg(), base_value);
+		}
 	}
 
 	// Apply Manaburn Damage Cap
@@ -291,12 +309,19 @@ int64 Mob::GetActDoTDamage(uint16 spell_id, int64 value, Mob* target, bool from_
 			) {
 				extra_dmg += GetExtraSpellAmt(spell_id, GetSpellDmg(), base_value)*ratio/100;
 			}
-			else if (
-				!spells[spell_id].no_heal_damage_item_mod &&
-				GetSpellDmg() &&
-				spells[spell_id].classes[(GetClass() % 17) - 1] >= GetLevel() - 5
-			) {
-				extra_dmg += GetExtraSpellAmt(spell_id, GetSpellDmg(), base_value)*ratio/100;
+			else if ((GetClass() - 1) >= Class::Warrior && (GetClass() - 1) <= Class::Berserker){
+				if (!spells[spell_id].no_heal_damage_item_mod &&
+					GetSpellDmg() &&
+					(spells[spell_id].classes[(GetClass() % 17) - 1] >= GetLevel() - 5)) {
+						extra_dmg += GetExtraSpellAmt(spell_id, GetSpellDmg(), base_value)*ratio/100;
+				}
+			}
+			else if (GetClass() == Class::RuneKnight) {
+				if (!spells[spell_id].no_heal_damage_item_mod &&
+					GetSpellDmg() &&
+					(spells[spell_id].class17 >= GetLevel() - 5)) {
+						extra_dmg += GetExtraSpellAmt(spell_id, GetSpellDmg(), base_value)*ratio/100;
+				}
 			}
 		}
 
@@ -337,12 +362,19 @@ int64 Mob::GetActDoTDamage(uint16 spell_id, int64 value, Mob* target, bool from_
 			) {
 				extra_dmg += GetExtraSpellAmt(spell_id, GetSpellDmg(), base_value);
 			}
-			else if (
-				!spells[spell_id].no_heal_damage_item_mod &&
-				GetSpellDmg() &&
-				spells[spell_id].classes[(GetClass() % 17) - 1] >= GetLevel() - 5
-			) {
-				extra_dmg += GetExtraSpellAmt(spell_id, GetSpellDmg(), base_value);
+			else if ((GetClass() - 1) >= Class::Warrior && (GetClass() - 1) <= Class::Berserker){
+				if (!spells[spell_id].no_heal_damage_item_mod &&
+					GetSpellDmg() &&
+					(spells[spell_id].classes[(GetClass() % 17) - 1] >= GetLevel() - 5)) {
+						extra_dmg += GetExtraSpellAmt(spell_id, GetSpellDmg(), base_value);
+				}
+			}
+			else if (GetClass() == Class::RuneKnight) {
+				if (!spells[spell_id].no_heal_damage_item_mod &&
+					GetSpellDmg() &&
+					(spells[spell_id].class17 >= GetLevel() - 5)) {
+						extra_dmg += GetExtraSpellAmt(spell_id, GetSpellDmg(), base_value);
+				}
 			}
 		}
 
@@ -479,12 +511,19 @@ int64 Mob::GetActSpellHealing(uint16 spell_id, int64 value, Mob* target, bool fr
 		) {
 			value += GetExtraSpellAmt(spell_id, GetHealAmt(), base_value); //Item Heal Amt Add before critical
 		}
-		else if (
-			!spells[spell_id].no_heal_damage_item_mod &&
-			GetHealAmt() &&
-			spells[spell_id].classes[(GetClass() % 17) - 1] >= GetLevel() - 5
-		) {
-			value += GetExtraSpellAmt(spell_id, GetHealAmt(), base_value); //Item Heal Amt Add before critical
+		else if ((GetClass() - 1) >= Class::Warrior && (GetClass() - 1) <= Class::Berserker) {
+			if (!spells[spell_id].no_heal_damage_item_mod &&
+				GetHealAmt() &&
+				(spells[spell_id].classes[(GetClass() % 17) - 1] >= GetLevel() - 5)) {
+					value += GetExtraSpellAmt(spell_id, GetHealAmt(), base_value); //Item Heal Amt Add before critical
+			}
+		}
+		else if (GetClass() == Class::RuneKnight) {
+			if (!spells[spell_id].no_heal_damage_item_mod &&
+				GetHealAmt() &&
+				(spells[spell_id].class17 >= GetLevel() - 5)) {
+					value += GetExtraSpellAmt(spell_id, GetHealAmt(), base_value); //Item Heal Amt Add before critical
+			}
 		}
 
 		if (target) {
@@ -533,12 +572,19 @@ int64 Mob::GetActSpellHealing(uint16 spell_id, int64 value, Mob* target, bool fr
 			) {
 				extra_heal += GetExtraSpellAmt(spell_id, GetHealAmt(), base_value);
 			}
-			else if (
-				!spells[spell_id].no_heal_damage_item_mod &&
+			else if ((GetClass() - 1) >= Class::Warrior && (GetClass() - 1) <= Class::Berserker) {
+				if (!spells[spell_id].no_heal_damage_item_mod &&
 				GetHealAmt() &&
-				spells[spell_id].classes[(GetClass() % 17) - 1] >= GetLevel() - 5
-			) {
-				extra_heal += GetExtraSpellAmt(spell_id, GetHealAmt(), base_value);
+				(spells[spell_id].classes[(GetClass() % 17) - 1] >= GetLevel() - 5)) {
+					extra_heal += GetExtraSpellAmt(spell_id, GetHealAmt(), base_value);
+				}
+			}
+			else if (GetClass() == Class::RuneKnight) {
+				if (!spells[spell_id].no_heal_damage_item_mod &&
+				GetHealAmt() &&
+				(spells[spell_id].class17 >= GetLevel() - 5)) {
+					extra_heal += GetExtraSpellAmt(spell_id, GetHealAmt(), base_value);
+				}
 			}
 		}
 
@@ -569,14 +615,29 @@ int32 Mob::GetActSpellCost(uint16 spell_id, int32 cost)
 		cost *= 2;
 
 	// Formula = Unknown exact, based off a random percent chance up to mana cost(after focuses) of the cast spell
-	if(itembonuses.Clairvoyance && spells[spell_id].classes[(GetClass()%17) - 1] >= GetLevel() - 5)
+	if ((GetClass() - 1) >= Class::Warrior && (GetClass() - 1) <= Class::Berserker)
 	{
-		int mana_back = itembonuses.Clairvoyance * zone->random.Int(1, 100) / 100;
-		// Doesnt generate mana, so best case is a free spell
-		if(mana_back > cost)
-			mana_back = cost;
+		if(itembonuses.Clairvoyance && (spells[spell_id].classes[(GetClass() % 17) - 1] >= GetLevel() - 5))
+		{
+			int mana_back = itembonuses.Clairvoyance * zone->random.Int(1, 100) / 100;
+			// Doesnt generate mana, so best case is a free spell
+			if(mana_back > cost)
+				mana_back = cost;
 
-		cost -= mana_back;
+			cost -= mana_back;
+		}
+	}
+	if ((GetClass() == Class::RuneKnight))
+	{
+		if(itembonuses.Clairvoyance && (spells[spell_id].class17 >= GetLevel() - 5))
+		{
+			int mana_back = itembonuses.Clairvoyance * zone->random.Int(1, 100) / 100;
+			// Doesnt generate mana, so best case is a free spell
+			if(mana_back > cost)
+				mana_back = cost;
+
+			cost -= mana_back;
+		}
 	}
 
 	int spec = GetSpecializeSkillValue(spell_id);
@@ -702,18 +763,42 @@ bool Client::TrainDiscipline(uint32 itemid) {
 	//can we use the spell?
 	const auto& spell = spells[spell_id];
 	const auto level_to_use = spell.classes[player_class - 1];
-	if (level_to_use == 255) {
-		Message(Chat::Red, "Your class cannot learn from this tome.");
-		//summon them the item back...
-		SummonItem(itemid);
-		return false;
-	}
+	const auto level_to_use_alt = spell.class17;
+	if ((GetClass() - 1) >= Class::Warrior && (GetClass() - 1) <= Class::Berserker)
+	{
+		if (level_to_use == 255) {
+			Message(Chat::Red, "Your class cannot learn from this tome.");
+			//summon them the item back...
+			SummonItem(itemid);
+			return false;
+		}
 
-	if (level_to_use > GetLevel()) {
-		Message(Chat::Red, fmt::format("You must be at least level {} to learn this discipline.", level_to_use).c_str());
-		//summon them the item back...
-		SummonItem(itemid);
-		return false;
+		if (level_to_use > GetLevel()) {
+			Message(Chat::Red, fmt::format("You must be at least level {} to learn this discipline.", level_to_use).c_str());
+			//summon them the item back...
+			SummonItem(itemid);
+			return false;
+		}
+	}
+	else if (GetClass() == Class::RuneKnight)
+	{
+		if (level_to_use_alt == 255) {
+			Message(Chat::Red, "Your class cannot learn from this tome.");
+			//summon them the item back...
+			SummonItem(itemid);
+			return false;
+		}
+
+		if (level_to_use_alt > GetLevel()) {
+			Message(Chat::Red, fmt::format("You must be at least level {} to learn this discipline.", level_to_use).c_str());
+			//summon them the item back...
+			SummonItem(itemid);
+			return false;
+		}
+	}
+	else
+	{
+		Message(Chat::Red, "CLASS ERROR - TRAIN DISCIPLINE");
 	}
 
 	//add it to PP.
@@ -764,7 +849,7 @@ bool Client::MemorizeSpellFromItem(uint32 item_id) {
 	const auto class_bit = static_cast<uint32>(1 << (GetClass() - 1));
 
 	if (!(item->Classes & class_bit)) {
-		Message(Chat::Red, "Your class cannot learn from this scroll.");
+		Message(Chat::Red, "Your class cannot learn from this scroll. class_bit");
 		SummonItem(item_id);
 		return false;
 	}
@@ -776,18 +861,42 @@ bool Client::MemorizeSpellFromItem(uint32 item_id) {
 	}
 
 	const auto& spell = spells[spell_id];
-	const auto level_to_use = spell.classes[GetClass() - 1];
-	if (level_to_use == 255) {
-		Message(Chat::Red, "Your class cannot learn from this scroll.");
-		SummonItem(item_id);
-		return false;
+	const auto level_to_use = spell.classes[GetClass()];
+	const auto level_to_use_alt = spell.class17;
+
+	if ((GetClass() - 1) >= Class::Warrior && (GetClass() - 1) <= Class::Berserker)
+	{
+		if (level_to_use == 255) {
+			Message(Chat::Red, fmt::format("Your class cannot learn from this scroll. (level_to_use 16 Classes - {}", spell.classes[GetClass()]).c_str());
+			SummonItem(item_id);
+			return false;
+		}
+
+		if (level_to_use > GetLevel()) {
+			Message(Chat::Red, fmt::format("You must be at least level {} to learn this spell.", level_to_use).c_str());
+			SummonItem(item_id);
+			return false;
+		}
+	}
+	else if (GetClass() == Class::RuneKnight)
+	{
+		if (level_to_use_alt == 255) {
+			Message(Chat::Red, "Your class cannot learn from this scroll. (level_to_use Class17)");
+			SummonItem(item_id);
+			return false;
+		}
+
+		if (level_to_use_alt > GetLevel()) {
+			Message(Chat::Red, fmt::format("You must be at least level {} to learn this spell.", level_to_use_alt).c_str());
+			SummonItem(item_id);
+			return false;
+		}
+	}
+	else
+	{
+		Message(Chat::Red, "CLASS ERROR - MEMORIZE SPELL FROM SCROLL");
 	}
 
-	if (level_to_use > GetLevel()) {
-		Message(Chat::Red, fmt::format("You must be at least level {} to learn this spell.", level_to_use).c_str());
-		SummonItem(item_id);
-		return false;
-	}
 
 	for (int index = 0; index < EQ::spells::SPELLBOOK_SIZE; index++) {
 		if (!HasSpellScribed(spell_id)) {
@@ -888,16 +997,39 @@ bool Client::UseDiscipline(uint32 spell_id, uint32 target) {
 	//can we use the spell?
 	const SPDat_Spell_Struct &spell = spells[spell_id];
 	uint8 level_to_use = spell.classes[GetClass() - 1];
-	if(level_to_use == 255) {
-		Message(Chat::Red, "Your class cannot learn from this tome.");
-		//should summon them a new one...
-		return false;
-	}
+	uint8 level_to_use_alt = spell.class17;
 
-	if(level_to_use > GetLevel()) {
-		MessageString(Chat::Red, DISC_LEVEL_USE_ERROR);
-		//should summon them a new one...
-		return false;
+	if ((GetClass() - 1) >= Class::Warrior && (GetClass() - 1) <= Class::Berserker)
+	{
+		if (level_to_use == 255) {
+			Message(Chat::Red, "Your class cannot learn from this tome.");
+			//should summon them a new one...
+			return false;
+		}
+
+		if (level_to_use > GetLevel()) {
+			MessageString(Chat::Red, DISC_LEVEL_USE_ERROR);
+			//should summon them a new one...
+			return false;
+		}
+	}
+	else if (GetClass() == Class::RuneKnight)
+	{
+		if (level_to_use_alt == 255) {
+			Message(Chat::Red, "Your class cannot learn from this tome.");
+			//should summon them a new one...
+			return false;
+		}
+
+		if (level_to_use_alt > GetLevel()) {
+			MessageString(Chat::Red, DISC_LEVEL_USE_ERROR);
+			//should summon them a new one...
+			return false;
+		}
+	}
+	else
+	{
+		Message(Chat::Red, "CLASS ERROR - USE DISCIPLINE");
 	}
 
 	if(GetEndurance() < spell.endurance_cost) {

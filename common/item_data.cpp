@@ -167,7 +167,7 @@ uint8 EQ::item::ConvertAugTypeBitToAugType(uint32 aug_type_bit)
 	}
 }
 
-bool EQ::ItemData::IsEquipable(uint16 race_id, uint16 class_id) const
+bool EQ::ItemData::IsEquipable(uint16 race_id, uint32 class_id) const
 {
 	if (!(Races & GetPlayerRaceBit(race_id))) {
 		return false;
@@ -180,7 +180,7 @@ bool EQ::ItemData::IsEquipable(uint16 race_id, uint16 class_id) const
 	return true;
 }
 
-bool EQ::ItemData::IsClassEquipable(uint16 class_id) const
+bool EQ::ItemData::IsClassEquipable(uint32 class_id) const
 {
 
 	if (!(Classes & GetPlayerClassBit(GetPlayerClassValue(class_id)))) {

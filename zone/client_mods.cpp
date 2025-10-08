@@ -453,6 +453,30 @@ uint32 Mob::GetClassLevelFactor()
 			}
 			break;
 		}
+		case Class::RuneKnight: {
+			if (mlevel < 35) {
+				multiplier = 210;
+			}
+			else if (mlevel < 45) {
+				multiplier = 220;
+			}
+			else if (mlevel < 51) {
+				multiplier = 230;
+			}
+			else if (mlevel < 56) {
+				multiplier = 240;
+			}
+			else if (mlevel < 60) {
+				multiplier = 250;
+			}
+			else if (mlevel < 68) {
+				multiplier = 260;
+			}
+			else {
+				multiplier = 270;
+			}
+			break;
+		}
 		default: {
 			if (mlevel < 35) {
 				multiplier = 210;
@@ -1069,7 +1093,7 @@ int32	Client::CalcMR()
 			MR = 20;
 	}
 	MR += itembonuses.MR + spellbonuses.MR + aabonuses.MR;
-	if (GetClass() == Class::Warrior || GetClass() == Class::Berserker) {
+	if (GetClass() == Class::Warrior || GetClass() == Class::Berserker || GetClass() == Class::RuneKnight) {
 		MR += GetLevel() / 2;
 	}
 	if (MR < 1) {

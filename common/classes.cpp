@@ -296,6 +296,23 @@ const char *GetClassIDName(uint8 class_id, uint8 level)
 				return "Berserker";
 			}
 		}
+		case Class::RuneKnight: {
+			if (level >= 75) {
+				return "Aegis";
+			} else if (level >= 70) {
+				return "Battlemage";
+			} else if (level >= 65) {
+				return "Arc Knight";
+			} else if (level >= 60) {
+				return "Guardian";
+			} else if (level >= 55) {
+				return "Sentinel";
+			} else if (level >= 51) {
+				return "Spellsword";
+			} else {
+				return "Rune Knight";
+			}
+		}
 		case Class::Banker:
 			return "Banker";
 		case Class::WarriorGM:
@@ -330,6 +347,8 @@ const char *GetClassIDName(uint8 class_id, uint8 level)
 			return "Beastlord Guildmaster";
 		case Class::BerserkerGM:
 			return "Berserker Guildmaster";
+		case Class::RuneKnightGM:
+			return "Rune Knight Guildmaster";
 		case Class::Merchant:
 			return "Merchant";
 		case Class::DiscordMerchant:
@@ -370,7 +389,7 @@ uint8 GetPlayerClassValue(uint8 class_id)
 	return class_id;
 }
 
-uint16 GetPlayerClassBit(uint8 class_id)
+uint32 GetPlayerClassBit(uint8 class_id)
 {
 	if (!IsPlayerClass(class_id)) {
 		return 0;
@@ -391,6 +410,7 @@ bool IsFighterClass(uint8 class_id)
 		case Class::Rogue:
 		case Class::Beastlord:
 		case Class::Berserker:
+		case Class::RuneKnight:
 			return true;
 		default:
 			return false;
@@ -404,6 +424,7 @@ bool IsSpellFighterClass(uint8 class_id)
 		case Class::Ranger:
 		case Class::ShadowKnight:
 		case Class::Beastlord:
+		case Class::RuneKnight:
 			return true;
 		default:
 			return false;
@@ -432,6 +453,7 @@ bool IsHybridClass(uint8 class_id)
 	case Class::ShadowKnight:
 	case Class::Bard:
 	case Class::Beastlord:
+	case Class::RuneKnight:
 		return true;
 	default:
 		return false;
@@ -475,6 +497,7 @@ bool IsHeroicINTCasterClass(uint8 class_id)
 		case Class::Magician:
 		case Class::Enchanter:
 		case Class::ShadowKnight:
+		case Class::RuneKnight:
 			return true;
 		default:
 			return false;
@@ -516,6 +539,7 @@ bool IsPlateClass(uint8 class_id)
 		case Class::Paladin:
 		case Class::ShadowKnight:
 		case Class::Bard:
+		case Class::RuneKnight:
 			return true;
 		default:
 			return false;
@@ -577,7 +601,7 @@ uint8 ClassArmorType(uint8 class_id)
 
 const std::string GetPlayerClassAbbreviation(uint8 class_id)
 {
-	if (!EQ::ValueWithin(class_id, Class::Warrior, Class::Berserker)) {
+	if (!EQ::ValueWithin(class_id, Class::Warrior, Class::RuneKnight)) {
 		return std::string("UNK");
 	}
 
@@ -614,11 +638,13 @@ const std::string GetPlayerClassAbbreviation(uint8 class_id)
 			return "BST";
 		case Class::Berserker:
 			return "BER";
+		case Class::RuneKnight:
+			return "RUN";
 	}
 
 	return std::string("UNK");
 }
 
 bool IsPlayerClass(uint8 class_id) {
-	return EQ::ValueWithin(class_id, Class::Warrior, Class::Berserker);
+	return EQ::ValueWithin(class_id, Class::Warrior, Class::RuneKnight);
 }

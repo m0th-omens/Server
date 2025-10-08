@@ -37,7 +37,7 @@ public:
 
 	bool IsType(int item_class);
 	bool IsStackable();
-	bool IsEquipable(uint16 race_bitmask, uint16 class_bitmask);
+	bool IsEquipable(uint16 race_bitmask, uint32 class_bitmask);
 	bool IsEquipable(int16 slot_id);
 	bool IsAugmentable();
 	int GetAugmentType();

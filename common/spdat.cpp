@@ -985,8 +985,15 @@ uint8 GetSpellMinimumLevel(uint16 spell_id)
 	const auto& spell = spells[spell_id];
 
 	for (int i = 0; i < Class::PLAYER_CLASS_COUNT; i++) {
-		if (spell.classes[i] < minimum_level) {
-			minimum_level = spell.classes[i];
+
+		if (i == 17){
+			minimum_level = spell.class17;
+		}
+
+		else {
+			if (spell.classes[i] < minimum_level) {
+				minimum_level = spell.classes[i];
+			}
 		}
 	}
 
@@ -1006,7 +1013,15 @@ uint8 GetSpellLevel(uint16 spell_id, uint8 class_id)
 		return UINT8_MAX;
 	}
 
-	return spells[spell_id].classes[class_id - 1];
+	if (class_id == 17) {
+		return spells[spell_id].class17; // Use class17 for the 17th class
+	}
+	else if (class_id >= 1 && class_id <= 16) {
+		return spells[spell_id].classes[class_id - 1]; // Use the classes array for the first 16 classes
+	}
+	else {
+		return UINT8_MAX; // Fallback, should never be reached.
+	}
 }
 
 // this will find the first occurrence of effect. this is handy
@@ -2403,6 +2418,11 @@ int GetSpellStatValue(uint16 spell_id, const char* stat_identifier, uint8 slot)
 	}
 
 	const auto id = Strings::ToLower(stat_identifier);
+
+	// for class 17
+	if (id == "class17"){
+		return spells[spell_id].class17;
+	}
 
 	if (slot < 16) {
 		if (id == "classes") { return spells[spell_id].classes[slot]; }

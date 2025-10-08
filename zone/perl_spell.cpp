@@ -108,7 +108,14 @@ int Perl_Spell_GetCastingAnimation(SPDat_Spell_Struct* self)
 
 int Perl_Spell_GetClasses(SPDat_Spell_Struct* self, uint8_t slot)
 {
-	return self->classes[slot];
+	if (self->class17 != 255)
+	{
+		return self->class17;
+	}
+	else
+	{
+		return self->classes[slot];
+	}
 }
 
 int Perl_Spell_GetComponent(SPDat_Spell_Struct* self, uint8_t slot)

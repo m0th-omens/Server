@@ -256,6 +256,7 @@ public:
 		int32_t     field234;
 		int32_t     field235;
 		int32_t     field236;
+		int32_t     class17;
 	};
 
 	static std::string PrimaryKey()
@@ -503,6 +504,7 @@ public:
 			"field234",
 			"field235",
 			"field236",
+			"class17",
 		};
 	}
 
@@ -746,6 +748,7 @@ public:
 			"field234",
 			"field235",
 			"field236",
+			"class17",
 		};
 	}
 
@@ -1023,6 +1026,7 @@ public:
 		e.field234             = 0;
 		e.field235             = 0;
 		e.field236             = 0;
+		e.class17              = 255;
 
 		return e;
 	}
@@ -1296,6 +1300,7 @@ public:
 			e.field234             = row[234] ? static_cast<int32_t>(atoi(row[234])) : 0;
 			e.field235             = row[235] ? static_cast<int32_t>(atoi(row[235])) : 0;
 			e.field236             = row[236] ? static_cast<int32_t>(atoi(row[236])) : 0;
+			e.class17			   = row[237] ? static_cast<int32_t>(atoi(row[237])) : 255;
 
 			return e;
 		}
@@ -1566,6 +1571,7 @@ public:
 		v.push_back(columns[234] + " = " + std::to_string(e.field234));
 		v.push_back(columns[235] + " = " + std::to_string(e.field235));
 		v.push_back(columns[236] + " = " + std::to_string(e.field236));
+		v.push_back(columns[237] + " = " + std::to_string(e.class17));
 
 		auto results = db.QueryDatabase(
 			fmt::format(
@@ -1824,6 +1830,7 @@ public:
 		v.push_back(std::to_string(e.field234));
 		v.push_back(std::to_string(e.field235));
 		v.push_back(std::to_string(e.field236));
+		v.push_back(std::to_string(e.class17));
 
 		auto results = db.QueryDatabase(
 			fmt::format(
@@ -2090,6 +2097,7 @@ public:
 			v.push_back(std::to_string(e.field234));
 			v.push_back(std::to_string(e.field235));
 			v.push_back(std::to_string(e.field236));
+			v.push_back(std::to_string(e.class17));
 
 			insert_chunks.push_back("(" + Strings::Implode(",", v) + ")");
 		}
@@ -2360,6 +2368,7 @@ public:
 			e.field234             = row[234] ? static_cast<int32_t>(atoi(row[234])) : 0;
 			e.field235             = row[235] ? static_cast<int32_t>(atoi(row[235])) : 0;
 			e.field236             = row[236] ? static_cast<int32_t>(atoi(row[236])) : 0;
+			e.class17			   = row[237] ? static_cast<int32_t>(atoi(row[237])) : 255;
 
 			all_entries.push_back(e);
 		}
@@ -2621,6 +2630,7 @@ public:
 			e.field234             = row[234] ? static_cast<int32_t>(atoi(row[234])) : 0;
 			e.field235             = row[235] ? static_cast<int32_t>(atoi(row[235])) : 0;
 			e.field236             = row[236] ? static_cast<int32_t>(atoi(row[236])) : 0;
+			e.class17			   = row[237] ? static_cast<int32_t>(atoi(row[237])) : 255;
 
 			all_entries.push_back(e);
 		}
@@ -2932,6 +2942,7 @@ public:
 		v.push_back(std::to_string(e.field234));
 		v.push_back(std::to_string(e.field235));
 		v.push_back(std::to_string(e.field236));
+		v.push_back(std::to_string(e.class17));
 
 		auto results = db.QueryDatabase(
 			fmt::format(
@@ -3191,6 +3202,7 @@ public:
 			v.push_back(std::to_string(e.field234));
 			v.push_back(std::to_string(e.field235));
 			v.push_back(std::to_string(e.field236));
+			v.push_back(std::to_string(e.class17));
 
 			insert_chunks.push_back("(" + Strings::Implode(",", v) + ")");
 		}

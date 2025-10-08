@@ -4709,14 +4709,16 @@ int64 Mob::CalcAAFocus(focusType type, const AA::Rank &rank, uint16 spell_id)
 
 	bool not_focusable = spells[spell_id].not_focusable;
 
-	int64  value       = 0;
-	int    lvlModifier = 100;
-	int    spell_level = 0;
-	int    lvldiff     = 0;
-	uint32 effect      = 0;
-	int32  base_value  = 0;
-	int32  limit_value = 0;
-	uint32 slot        = 0;
+	int64  	value       = 0;
+	int    	lvlModifier = 100;
+	int    	spell_level = 0;
+	int    	spell_level_alt  = 0;
+	int    	lvldiff     = 0;
+	int    	lvldiff_alt = 0;
+	uint32 	effect      = 0;
+	int32  	base_value  = 0;
+	int32  	limit_value = 0;
+	uint32 	slot        = 0;
 
 	int index_id = -1;
 	uint32 focus_reuse_time = 0;
@@ -4817,23 +4819,45 @@ int64 Mob::CalcAAFocus(focusType type, const AA::Rank &rank, uint16 spell_id)
 
 			case SpellEffect::LimitMaxLevel:
 				spell_level = spell.classes[(GetClass() % 17) - 1];
+				spell_level_alt = spell.class17;
 				lvldiff     = spell_level - base_value;
+				lvldiff_alt = spell_level_alt - base_value;
 				// every level over cap reduces the effect by base2 percent unless from a clicky when
 				// ItemCastsUseFocus is true
-				if (lvldiff > 0 && (spell_level <= RuleI(Character, MaxLevel) || RuleB(Character, ItemCastsUseFocus) == false)) {
-					if (limit_value > 0) {
-						lvlModifier -= limit_value * lvldiff;
-						if (lvlModifier < 1) {
+				if (GetClass() == Class::RuneKnight) {
+					if (lvldiff_alt > 0 && (spell_level_alt <= RuleI(Character, MaxLevel) || RuleB(Character, ItemCastsUseFocus) == false)) {
+						if (limit_value > 0) {
+							lvlModifier -= limit_value * lvldiff_alt;
+							if (lvlModifier < 1) {
+								LimitFailure = true;
+							}
+						}
+						else {
 							LimitFailure = true;
 						}
 					}
-					else {
-						LimitFailure = true;
+				}
+				else
+				{
+				if (lvldiff > 0 && (spell_level <= RuleI(Character, MaxLevel) || RuleB(Character, ItemCastsUseFocus) == false)) {
+					if (limit_value > 0) {
+						lvlModifier -= limit_value * lvldiff;
+							if (lvlModifier < 1) {
+								LimitFailure = true;
+							}
+						}
+						else {
+							LimitFailure = true;
+						}
 					}
 				}
 				break;
 
 			case SpellEffect::LimitMinLevel:
+				if (spell.class17 < base_value) {
+					LimitFailure = true;
+				}
+
 				if ((spell.classes[(GetClass() % 17) - 1]) < base_value) {
 					LimitFailure = true;
 				}
@@ -5477,7 +5501,9 @@ int64 Mob::CalcFocusEffect(focusType type, uint16 focus_id, uint16 spell_id, boo
 	int64  value           = 0;
 	int    lvlModifier     = 100;
 	int    spell_level     = 0;
+	int		spell_level_alt = 0;
 	int    lvldiff         = 0;
+	int 	lvldiff_alt = 0;
 	uint32 Caston_spell_id = 0;
 	int    index_id        = -1;
 	uint32 focus_reuse_time = 0; //If this is set and all limits pass, start timer at end of script.
@@ -5543,19 +5569,39 @@ int64 Mob::CalcFocusEffect(focusType type, uint16 focus_id, uint16 spell_id, boo
 					break;
 				}
 				spell_level = spell.classes[(GetClass() % 17) - 1];
+				spell_level_alt = spell.class17;
 				lvldiff     = spell_level - focus_spell.base_value[i];
+				lvldiff_alt = spell_level_alt - focus_spell.base_value[i];
 				// every level over cap reduces the effect by focus_spell.base2[i] percent unless from a clicky
 				// when ItemCastsUseFocus is true
-				if (lvldiff > 0 && (spell_level <= RuleI(Character, MaxLevel) ||
-									RuleB(Character, ItemCastsUseFocus) == false)) {
-					if (focus_spell.limit_value[i] > 0) {
-						lvlModifier -= focus_spell.limit_value[i] * lvldiff;
-						if (lvlModifier < 1) {
+				if (GetClass() == Class::RuneKnight)
+				{
+					if (lvldiff_alt > 0 && (spell_level_alt <= RuleI(Character, MaxLevel) ||
+						RuleB(Character, ItemCastsUseFocus) == false)) {
+						if (focus_spell.limit_value[i] > 0) {
+							lvlModifier -= focus_spell.limit_value[i] * lvldiff_alt;
+							if (lvlModifier < 1) {
+								return 0;
+							}
+						}
+						else {
 							return 0;
 						}
 					}
-					else {
-						return 0;
+				}
+				else
+				{
+					if (lvldiff > 0 && (spell_level <= RuleI(Character, MaxLevel) ||
+						RuleB(Character, ItemCastsUseFocus) == false)) {
+						if (focus_spell.limit_value[i] > 0) {
+							lvlModifier -= focus_spell.limit_value[i] * lvldiff;
+							if (lvlModifier < 1) {
+								return 0;
+							}
+						}
+						else {
+							return 0;
+						}
 					}
 				}
 				break;
@@ -7123,11 +7169,17 @@ uint16 Mob::GetProcID(uint16 spell_id, uint8 effect_index)
 	// custom servers to create new spells, we will still do this
 	bool sk = false;
 	bool other = false;
-	for (int x = 0; x < 16; x++) {
+	for (int x = 0; x < 17; x++) {
 		if (x == 4) {
 			if (spells[spell_id].classes[4] < 255)
 				sk = true;
-		} else {
+		}
+		else if (x == 17)
+		{
+			if (spells[spell_id].class17 < 255)
+				other = true;
+		}
+		else {
 			if (spells[spell_id].classes[x] < 255)
 				other = true;
 		}
@@ -7834,6 +7886,11 @@ bool Mob::PassCastRestriction(int value)
 				return true;
 			break;
 
+		case IS_RUNEKNIGHT_CLASS:
+			if (GetClass() == Class::RuneKnight)
+				return true;
+			break;
+
 		case IS_CLASS_CLR_SHM_DRU:
 			if (IsWISCasterClass(GetClass()))
 				return true;
@@ -7941,7 +7998,7 @@ bool Mob::PassCastRestriction(int value)
 
 		case IS_CLASS_CHAIN_OR_PLATE:
 			if ((GetClass() == Class::Warrior) || (GetClass() == Class::Bard) || (GetClass() == Class::ShadowKnight) || (GetClass() == Class::Paladin) || (GetClass() == Class::Cleric)
-				|| (GetClass() == Class::Ranger) || (GetClass() == Class::Shaman) || (GetClass() == Class::Rogue) || (GetClass() == Class::Berserker)) {
+				|| (GetClass() == Class::Ranger) || (GetClass() == Class::Shaman) || (GetClass() == Class::Rogue) || (GetClass() == Class::Berserker) || GetClass() == Class::RuneKnight) {
 				return true;
 			}
 			break;

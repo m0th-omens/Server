@@ -187,7 +187,7 @@ bool Perl_QuestItem_IsEquipable(EQ::ItemInstance* self, int16 slot_id)
 	return self->IsEquipable(slot_id);
 }
 
-bool Perl_QuestItem_IsEquipable(EQ::ItemInstance* self, uint16 race_bitmask, uint16 class_bitmask)
+bool Perl_QuestItem_IsEquipable(EQ::ItemInstance* self, uint16 race_bitmask, uint32 class_bitmask)
 {
 	return self->IsEquipable(race_bitmask, class_bitmask);
 }
@@ -417,7 +417,7 @@ void perl_register_questitem()
 	package.add("IsAugmentable", &Perl_QuestItem_IsAugmentable);
 	package.add("IsAugmented", &Perl_QuestItem_IsAugmented);
 	package.add("IsEquipable", (bool(*)(EQ::ItemInstance*, int16))&Perl_QuestItem_IsEquipable);
-	package.add("IsEquipable", (bool(*)(EQ::ItemInstance*, uint16, uint16))&Perl_QuestItem_IsEquipable);
+	package.add("IsEquipable", (bool(*)(EQ::ItemInstance*, uint16, uint32))&Perl_QuestItem_IsEquipable);
 	package.add("IsEvolving", &Perl_QuestItem_IsEvolving);
 	package.add("IsExpendable", &Perl_QuestItem_IsExpendable);
 	package.add("IsInstanceNoDrop", &Perl_QuestItem_IsInstanceNoDrop);

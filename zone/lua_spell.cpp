@@ -241,7 +241,12 @@ int Lua_Spell::GetTimeOfDay() {
 int Lua_Spell::GetClasses(int i) {
 	Lua_Safe_Call_Int();
 
-	if(i >= 16 || i < 0) {
+	if (i == 17)
+	{
+		return self->class17;
+	}
+
+	if(i >= 18 || i < 0) {
 		return 0;
 	}
 
